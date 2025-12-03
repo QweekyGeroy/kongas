@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="theme-color" content="#0a0a0a">
+  <title>kongas | Xasea</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+  
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(to bottom right, #0a0a0a, #1a1a1a, #0a0a0a);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 20px 16px;
+      gap: 24px;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    /* Никнейм — адаптивный размер */
+    .nickname {
+      font-family: cursive;
+      font-weight: 700;
+      color: #ffffff;
+      text-shadow: 0 6px 20px rgba(0,0,0,0.6);
+      letter-spacing: 2px;
+      font-size: clamp(42px, 12vw, 78px); /* от 42px до 78px */
+      text-align: center;
+    }
+
+    .glass-card {
+      width: 100%;
+      max-width: 580px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-radius: 34px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+      padding: 40px 30px;
+      overflow: hidden;
+    }
+
+    .glass-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 180px;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.16), transparent);
+      pointer-events: none;
+    }
+
+    /* Грид → на мобильных одна колонка */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 36px;
+    }
+    @media (min-width: 640px) {
+      .grid { grid-template-columns: 1fr 1fr; gap: 50px; }
+    }
+
+    .social-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .icon {
+      width: 90px;
+      height: 90px;
+      margin-bottom: 20px;
+      filter: drop-shadow(0 12px 30px rgba(0,0,0,0.6));
+    }
+    .discord-icon { width: 110px; height: 90px; border-radius: 24px; }
+
+    .btn, .btn-like {
+      padding: 14px 32px;
+      font-size: 17px;
+      font-weight: 500;
+      border-radius: 50px;
+      color: white;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+      min-width: 180px;
+      border: none !important;
+      outline: none !important;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.35s ease;
+    }
+
+    .btn { background: linear-gradient(135deg, #229ed9, #1e7bb6); box-shadow: 0 12px 32px rgba(34,158,217,0.45); }
+    .btn.discord { background: linear-gradient(135deg, #5865F2, #4752c4); box-shadow: 0 12px 32px rgba(88,101,242,0.45); }
+
+    .btn:hover, .btn-like:hover,
+    .btn:active, .btn-like:active {
+      transform: translateY(-6px) scale(1.06);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+    }
+
+    .subtitle {
+      font-size: 14px;
+      opacity: 0.7;
+      letter-spacing: 1.2px;
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    /* ─────── МУЗЫКАЛЬНЫЙ ПЛЕЕР (мобильная адаптация) ─────── */
+    .music-player {
+      width: 100%;
+      max-width: 580px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      border-radius: 26px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+      flex-wrap: wrap;
+    }
+
+    .album-art {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      object-fit: cover;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+      flex-shrink: 0;
+    }
+
+    .track-info { flex: 1; min-width: 140px; }
+    .track-title { font-weight: 600; font-size: 16px; color: #6ee7ff; }
+
+    .progress-container {
+      flex: 1;
+      min-width: 200px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      opacity: 0.85;
+    }
+
+    .progress-bar {
+      flex: 1;
+      height: 5px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 3px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .progress { width: 0%; height: 100%; background: #6ee7ff; border-radius: 3px; }
+
+    .play-pause-btn {
+      width: 44px; height: 44px;
+      background: #6ee7ff;
+      color: #000;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 20px;
+      box-shadow: 0 10px 25px rgba(110,231,255,0.5);
+      flex-shrink: 0;
+    }
+
+    .volume-container {
+      position: relative;
+      cursor: pointer;
+    }
+
+    .volume-icon { font-size: 22px; opacity: 0.9; }
+
+    .volume-popup {
+      position: absolute;
+      left: 50%;
+      bottom: 110%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(15px);
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+      z-index: 10;
+    }
+
+    .volume-container:hover .volume-popup,
+    .volume-container:active .volume-popup {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .volume-slider {
+      -webkit-appearance: none;
+      width: 100px;
+      height: 6px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 3px;
+      outline: none;
+    }
+
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px; height: 18px;
+      background: #6ee7ff;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(110,231,255,0.5);
+    }
+
+    /* Toast */
+    .copied {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(88, 101, 242, 0.95);
+      color: white;
+      padding: 14px 32px;
+      border-radius: 18px;
+      font-size: 17px;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .copied.show { animation: slideInOut 3s ease-out forwards; }
+    @keyframes slideInOut {
+      0%   { opacity: 0; transform: translateX(-50%) translateY(-30px); }
+      15%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+      85%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-30px); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="nickname">kongas | Xasea</div>
+
+  <div class="glass-card">
+    <div class="grid">
+      <div class="social-block">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Telegram_logo.svg/512px-Telegram_logo.svg.png" alt="Telegram" class="icon">
+        <a href="https://t.me/blqpb" target="_blank" class="btn btn-like">My Telegram</a>
+      </div>
+      <div class="social-block">
+        <img src="https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png"
+             alt="Discord" class="icon discord-icon">
+        <button onclick="copyDiscord(this)" class="btn discord">My Discord</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="subtitle">I have nothing to say</div>
+
+  <!-- ПЛЕЕР -->
+  <div class="music-player">
+    <img src="https://archive.org/download/lumi-athena-jnhgys-smoke-it-off/smokeitoffcoverart.jpeg" alt="SMOKE IT OFF!" class="album-art">
+
+    <div class="track-info">
+      <div class="track-title">SMOKE IT OFF!</div>
+      <div style="font-size:13px; opacity:0.8;">Lumi Athena feat. jnhygs</div>
+    </div>
+
+    <div class="progress-container">
+      <span id="current-time">0:00</span>
+      <div class="progress-bar" onclick="seek(event)">
+        <div class="progress" id="progress"></div>
+      </div>
+      <span id="total-time">0:00</span>
+    </div>
+
+    <div class="play-pause-btn" id="playPauseBtn" onclick="togglePlay()">▶</div>
+
+    <div class="volume-container" id="volumeContainer">
+      <span class="volume-icon" onclick="toggleMute()">🔊</span>
+      <div class="volume-popup">
+        <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="100">
+        <span class="volume-percent" id="volumePercent">100%</span>
+      </div>
+    </div>
+
+    <audio id="audio" preload="metadata">
+      <source src="https://archive.org/download/lumi-athena-jnhgys-smoke-it-off/Lumi%20Athena%20%26%20Jnhygs%20-%20SMOKE%20IT%20OFF!.mp3" type="audio/mpeg">
+    </audio>
+  </div>
+
+  <div class="copied" id="copied">Copied!</div>
+
+  <script>
+    // Всё остальное без изменений, только мелкие правки для мобильных
+    function copyDiscord(button) {
+      navigator.clipboard.writeText("kongas1337");
+      const toast = document.getElementById("copied");
+      toast.classList.remove("show");
+      void toast.offsetWidth;
+      toast.classList.add("show");
+    }
+
+    const audio = document.getElementById("audio");
+    const playPauseBtn = document.getElementById("playPauseBtn");
+    const progress = document.getElementById("progress");
+    const currentTimeEl = document.getElementById("current-time");
+    const totalTimeEl = document.getElementById("total-time");
+    const volumeSlider = document.getElementById("volumeSlider");
+    const volumeIcon = document.querySelector(".volume-icon");
+    const volumePercent = document.getElementById("volumePercent");
+    let isPlaying = false;
+    let isMuted = false;
+    let previousVolume = 100;
+
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    audio.addEventListener("loadedmetadata", () => {
+      totalTimeEl.textContent = formatTime(audio.duration);
+    });
+
+    function togglePlay() {
+      if (isPlaying) {
+        audio.pause();
+        playPauseBtn.innerHTML = "▶";
+      } else {
+        audio.play();
+        playPauseBtn.innerHTML = "❚❚";
+      }
+      isPlaying = !isPlaying;
+    }
+
+    audio.addEventListener("timeupdate", () => {
+      if (audio.duration) {
+        const percent = (audio.currentTime / audio.duration) * 100;
+        progress.style.width = percent + "%";
+        currentTimeEl.textContent = formatTime(audio.currentTime);
+      }
+    });
+
+    function seek(e) {
+      const bar = e.currentTarget;
+      const rect = bar.getBoundingClientRect();
+      const clickX = e.type.includes('touch') ? e.touches[0].clientX - rect.left : e.offsetX;
+      const width = bar.offsetWidth;
+      audio.currentTime = (clickX / width) * audio.duration;
+    }
+
+    // Поддержка touch-событий для прогресс-бара
+    document.querySelector(".progress-bar").addEventListener("touchstart", seek, { passive: true });
+    document.querySelector(".progress-bar").addEventListener("touchmove", seek, { passive: true });
+
+    volumeSlider.addEventListener("input", () => {
+      const vol = volumeSlider.value / 100;
+      audio.volume = vol;
+      previousVolume = volumeSlider.value;
+      volumePercent.textContent = `${volumeSlider.value}%`;
+      updateVolumeIcon(vol);
+    });
+
+    function toggleMute() {
+      if (isMuted) {
+        volumeSlider.value = previousVolume;
+        audio.volume = previousVolume / 100;
+        volumePercent.textContent = `${previousVolume}%`;
+        isMuted = false;
+      } else {
+        previousVolume = volumeSlider.value;
+        volumeSlider.value = 0;
+        audio.volume = 0;
+        volumePercent.textContent = "0%";
+        isMuted = true;
+      }
+      updateVolumeIcon(audio.volume);
+    }
+
+    function updateVolumeIcon(vol) {
+      if (vol === 0) {
+        volumeIcon.innerHTML = "🔇";
+      } else {
+        volumeIcon.innerHTML = "🔊";
+      }
+    }
+
+    updateVolumeIcon(1);
+  </script>
+</body>
+</html>
