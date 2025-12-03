@@ -94,6 +94,213 @@
       text-align: center;
     }
 
+    /* Row that holds avatar + nickname */
+    .nickname-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .avatar {
+      width: clamp(48px, 8vw, 80px);
+      height: clamp(48px, 8vw, 80px);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      color: #001;
+      font-weight: 700;
+      user-select: none;
+      box-shadow: 0 10px 30px var(--shadow);
+      border: 2px solid rgba(255,255,255,0.12);
+      overflow: hidden;
+    }
+
+    /* When avatar is an image, make it cover the circle */
+    .avatar.img, .avatar img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      border-radius: inherit;
+    }
+
+    /* Tabs bar */
+    .tabs {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+
+    .tab {
+      padding: 10px 18px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--text);
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+
+    .tab:hover { transform: translateY(-4px); }
+
+    .tab.active {
+      background: linear-gradient(90deg, var(--accent), #a78bfa);
+      color: #000;
+      box-shadow: 0 12px 30px var(--shadow);
+      transform: translateY(-6px) scale(1.02);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Projects: split button and glass panels */
+    .split-btn {
+      display: flex;
+      gap: 0;
+      width: 520px;
+      max-width: 92%;
+      margin: 6px auto 18px;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      box-shadow: 0 10px 30px var(--shadow);
+    }
+
+    .split-half {
+      flex: 1;
+      padding: 12px 18px;
+      text-align: center;
+      cursor: pointer;
+      background: transparent;
+      border: 0;
+      color: var(--text);
+      font-weight: 700;
+      transition: background 0.18s ease, transform 0.12s ease;
+      user-select: none;
+    }
+
+    .split-half:first-child { border-right: 1px solid rgba(255,255,255,0.06); }
+    .split-half:active { transform: translateY(1px); }
+    .split-half.active {
+      background: linear-gradient(90deg, var(--accent), #a78bfa);
+      color: #000;
+    }
+
+    .project-panel {
+      max-width: 760px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 14px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      box-shadow: 0 12px 40px var(--shadow);
+      opacity: 0;
+      transform: translateX(-50%) translateY(8px) scale(0.995);
+      transition: opacity .26s ease, transform .26s ease;
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: min(760px, 92%);
+    }
+
+    .project-panel.show { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+
+    .project-host {
+      position: relative;
+      width: 100%;
+      display:flex;
+      justify-content:center;
+      min-height: 120px; /* reserve space for panels */
+      margin-top: 8px;
+    }
+
+    .project-thumb {
+      width: 96px; height: 96px; border-radius: 50%; overflow: hidden; flex: 0 0 96px;
+      box-shadow: 0 8px 24px var(--shadow);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .project-thumb img { width:100%; height:100%; object-fit:cover; object-position:50% 18%; display:block; }
+
+    .project-body { flex:1; }
+    .project-title { font-size: 18px; font-weight: 800; color: var(--accent); }
+    .project-desc { margin-top:6px; font-size:14px; color: var(--text-secondary); }
+
+    @media (max-width:640px) {
+      .split-btn { width: 100%; }
+      .project-panel { flex-direction: row; gap:12px; padding:12px; }
+      .project-thumb { width:72px; height:72px; flex:0 0 72px; }
+    }
+
+    /* Mobile-specific adjustments for better layout on phones */
+    @media (max-width: 480px) {
+      body { padding: 18px 12px; gap: 14px; }
+
+      .nickname {
+        font-size: clamp(26px, 10vw, 40px);
+        letter-spacing: 1.5px;
+      }
+
+      .avatar {
+        width: clamp(40px, 10vw, 64px);
+        height: clamp(40px, 10vw, 64px);
+      }
+
+      .tabs {
+        gap: 8px;
+        padding: 0 6px;
+      }
+
+      .tab {
+        flex: 1 1 0;
+        padding: 10px 12px;
+        font-size: 15px;
+        min-width: 0;
+      }
+
+      /* Make split button vertical on small screens */
+      .split-btn {
+        flex-direction: column;
+        border-radius: 16px;
+        overflow: visible;
+      }
+      .split-half { border-radius: 12px; }
+
+      /* Panels flow in document (not absolute) on phones */
+      .project-host {
+        position: static;
+        min-height: auto;
+        margin-top: 6px;
+      }
+      .project-panel {
+        position: static;
+        left: auto;
+        top: auto;
+        width: 100%;
+        transform: none;
+        opacity: 0;
+        margin: 8px 0 0 0;
+      }
+      .project-panel.show { opacity: 1; }
+
+      .project-panel { padding: 12px; }
+      .project-thumb { width:56px; height:56px; flex:0 0 56px; }
+      .project-body { padding: 0; }
+
+      .glass-card { padding: 28px 20px; }
+      .music-player { padding: 12px 16px; gap: 12px; }
+    }
+
     .glass-card {
       position: relative;
       width: 100%;
@@ -376,8 +583,17 @@
 
 <body data-theme="dark">
 
-  <div class="nickname">kongas | Xasea</div>
+  <div class="nickname-row">
+    <img src="images.jpg" alt="Kongas avatar" class="avatar" loading="lazy">
+    <div class="nickname">kongas | Xasea</div>
+  </div>
 
+  <div class="tabs" role="tablist" aria-label="Sections">
+    <button class="tab active" role="tab" aria-selected="true" data-target="bio">Bio</button>
+    <button class="tab" role="tab" aria-selected="false" data-target="projects">Projects</button>
+  </div>
+
+  <section id="bio" class="tab-content active">
   <div class="glass-card">
     <div class="grid">
       <div class="social-block">
@@ -426,6 +642,32 @@
       <source src="https://archive.org/download/lumi-athena-jnhgys-smoke-it-off/Lumi%20Athena%20%26%20Jnhgys%20-%20SMOKE%20IT%20OFF!.mp3" type="audio/mpeg">
     </audio>
   </div>
+
+  </section>
+
+  <section id="projects" class="tab-content" aria-hidden="true">
+    <div class="split-btn" role="tablist" aria-label="Project types">
+      <button class="split-half" data-panel="panel-client">kongas client</button>
+      <button class="split-half" data-panel="panel-force">Force internal</button>
+    </div>
+
+    <div class="project-host">
+      <div id="panel-client" class="project-panel" aria-hidden="true">
+        <div class="project-thumb"><img src="kongas_client.jpg" alt="kongas client"></div>
+        <div class="project-body">
+          <div class="project-title">kongas client</div>
+          <div class="project-desc">A client created for private use with integrated cheats</div>
+        </div>
+      </div>
+
+      <div id="panel-force" class="project-panel" aria-hidden="true">
+        <div class="project-body">
+          <div class="project-title">Force internal</div>
+          <div class="project-desc">An internal cheat created specifically for the game DDNET.</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <select class="theme-selector" onchange="changeTheme(this.value)">
     <option value="dark">Темная</option>
@@ -542,6 +784,55 @@
     }
 
     updateVolumeIcon(1);
+  </script>
+
+  <script>
+    // Simple tab switcher: toggles .active on .tab and .tab-content
+    (function(){
+      const tabs = Array.from(document.querySelectorAll('.tab'));
+      const contents = Array.from(document.querySelectorAll('.tab-content'));
+
+      const nicknameRow = document.querySelector('.nickname-row');
+
+      function setActive(id) {
+        contents.forEach(c => {
+          const active = c.id === id;
+          c.classList.toggle('active', active);
+          c.setAttribute('aria-hidden', String(!active));
+        });
+        tabs.forEach(t => {
+          const is = t.getAttribute('data-target') === id;
+          t.classList.toggle('active', is);
+          t.setAttribute('aria-selected', String(is));
+        });
+        // Hide nickname on Projects tab, show otherwise
+        if (nicknameRow) {
+          if (id === 'projects') nicknameRow.style.display = 'none';
+          else nicknameRow.style.display = '';
+        }
+      }
+
+      tabs.forEach(t => t.addEventListener('click', () => setActive(t.getAttribute('data-target'))));
+    })();
+  </script>
+
+  <script>
+    // Project split button handlers: show corresponding glass panel
+    (function(){
+      const halves = Array.from(document.querySelectorAll('.split-half'));
+      const panels = Array.from(document.querySelectorAll('.project-panel'));
+
+      function showPanel(id) {
+        panels.forEach(p => {
+          const is = p.id === id;
+          p.classList.toggle('show', is);
+          p.setAttribute('aria-hidden', String(!is));
+        });
+        halves.forEach(h => h.classList.toggle('active', h.getAttribute('data-panel') === id));
+      }
+
+      halves.forEach(h => h.addEventListener('click', () => showPanel(h.getAttribute('data-panel'))));
+    })();
   </script>
 
 </body>
